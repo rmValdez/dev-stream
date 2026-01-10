@@ -21,6 +21,9 @@ const config: Config = {
         "ops-green": "#00ff9d",
         "ops-danger": "#ff4d4d",
         "ops-warning": "#ff9d00",
+        "spotify-black": "#000000",
+        "spotify-grey": "#181818",
+        "spotify-lightgrey": "#b3b3b3",
       },
       fontFamily: {
         display: ["var(--font-display)", "sans-serif"],

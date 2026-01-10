@@ -7,7 +7,7 @@
     text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9;
   }
   .mesh-gradient {
-    background-color: #0a0c0d;
+    background-color: var(--background);
     background-image: 
       radial-gradient(at 0% 0%, rgba(0, 224, 245, 0.15) 0px, transparent 50%),
       radial-gradient(at 100% 100%, rgba(39, 57, 58, 0.2) 0px, transparent 50%);
@@ -16,7 +16,7 @@
     width: 4px;
   }
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: #0a0c0d;
+    background: transparent;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: #27393a;

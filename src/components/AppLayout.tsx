@@ -11,7 +11,7 @@ import {
   NavItem,
 } from "@/components/AppNavigation";
 import Footer from "@/components/Footer";
-import TerminalOverlay from "@/components/TerminalOverlay";
+import TerminalOverlay from "@/components/TerminalOverlay/TerminalOverlay";
 import AppRoute from "@/components/AppRoute";
 import SystemStatus from "@/components/SystemStatus/SystemStatus";
 

@@ -3,13 +3,13 @@
 import React from "react";
 import PageWrapper from "@/components/PageWrapper/PageWrapper";
 
+import PageHeader from "@/components/PageHeader/PageHeader";
+
 export default function ProfilePage() {
   return (
     <PageWrapper>
       <div className="space-y-6">
-        <h1 className="text-2xl font-black uppercase tracking-widest text-primary glitch-text">
-          User Profile
-        </h1>
+        <PageHeader title="User Profile" />
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-xl">
           <p className="text-white/60 font-mono text-sm leading-relaxed">
             [SYSTEM] Retrieving user dossier...

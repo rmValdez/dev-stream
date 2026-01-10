@@ -19,10 +19,13 @@ export const NAVIGATION_ITEMS: NavItem[] = [
     iconName: "explore",
     children: [
       { label: "Music", href: "/social-mixes/music" },
-      { label: "Messages", href: "/social-mixes/messages" },
-      { label: "Podcasts", href: "/social-mixes/podcasts" },
-      { label: "Live Radio", href: "/social-mixes/live-radio" },
+      { label: "Radio Podcasts", href: "/social-mixes/podcasts" },
     ],
+  },
+  {
+    label: "The Organization",
+    iconName: "groups",
+    href: "/theOrganization",
   },
   {
     label: "Live Metrics",
