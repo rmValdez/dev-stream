@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 export default function MusicPlayer() {
   return (
@@ -9,11 +10,14 @@ export default function MusicPlayer() {
         {/* Track Info */}
         <div className="flex items-center gap-4 min-w-[180px] w-1/3">
           <div className="w-14 h-14 rounded overflow-hidden shadow-lg shrink-0">
-            <img
-              alt="Cover Art"
-              className="w-full h-full object-cover"
-              src="https://replicate.delivery/pbxt/JR3pX7O7l5O4TfL8g6e4k8g8k8k8k8k8k8k8k8k8k8k8k8k8/https://lh3.googleusercontent.com/aida-public/AB6AXuAuk1psAPI6zLzZjjKWpf6Ak8i3ggvxrOH6ZhaStngEEgsE8Jo76lKywSIwTP6k_qZZla5sYl0XRUPm_N000RNc-Gdvx2S5zYcDhHHIYKhq4GCS9umtNVo1QpRCyMDaPbvHLS5tq8mwLW6ZkRudhMyLnCQb4zRD1CAip3xZTFSJADawiF0SkG15agpGJiCcyfWPtDdfKKGQe8oVwYA7T_R2jl10DEuTxAd6FrmfjpI8QOqZuWmBOuRrEEFrL4o2XlpnAMOgAyki7bze"
-            />
+            <div className="relative w-full h-full">
+              <Image
+                alt="Cover Art"
+                className="object-cover"
+                src="/favicon.ico"
+                fill
+              />
+            </div>
           </div>
           <div className="flex flex-col min-w-0">
             <a

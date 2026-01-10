@@ -109,6 +109,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
     );
   };
 
+  const isAuthPage = pathname === "/login" || pathname === "/register";
+
+  if (isAuthPage) {
+    return (
+      <div className="min-h-screen w-full font-display text-slate-900 dark:text-white relative mesh-gradient">
+        {children}
+      </div>
+    );
+  }
+
   return (
     <AppRoute>
       <div className="flex h-screen w-full relative mesh-gradient font-display text-slate-900 dark:text-white overflow-hidden">
@@ -157,8 +167,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <div
                 className="w-10 h-10 rounded-full bg-cover border border-black/10 dark:border-white/10 grayscale group-hover:grayscale-0 transition-all shadow-lg flex-shrink-0"
                 style={{
-                  backgroundImage:
-                    "url('https://replicate.delivery/pbxt/JR3pX7O7l5O4TfL8g6e4k8g8k8k8k8k8k8k8k8k8k8k8k8k8/https://lh3.googleusercontent.com/aida-public/AB6AXuC2Tkx2dc7TbK-Cx0HB2u64H6Rh7off1CUQYFWVPmJ14y7mZy29upnjlzPfjlHOrkkVY8GbQWt6f9W7kcYGN2yz2y-yEdtCFRDWKpcbpDPtPVF6DXyHTxHNBK3It5KQFUJGxtCu3E_vn7cn4qjAOHpTm4Mn_Gb6h1lbI0AWVqy53kial7DzWi2PvHxbZoKFF3Y1Q70WpDVMmeuapDgtDvq-JZDwkKKlQa1oNe6njTX2EdrSiSWWKXXG19lojDd4OyxrUnaNrfHS2g6c')",
+                  backgroundImage: `url('${
+                    mounted && user?.avatar ? user.avatar : "/favicon.ico"
+                  }')`,
                 }}
               ></div>
               <div className="overflow-hidden">
@@ -167,7 +178,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 </p>
                 <p className="text-[9px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-wider">
                   {mounted
-                    ? user?.name || "System Architect"
+                    ? user?.role || "System Architect"
                     : "System Architect"}
                 </p>
               </div>

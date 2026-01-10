@@ -53,8 +53,7 @@ export default function MusicPage() {
         key: "C",
         duration: "03:00",
         status: "queued",
-        cover:
-          "https://replicate.delivery/pbxt/JR3pX7O7l5O4TfL8g6e4k8g8k8k8k8k8k8k8k8k8k8k8k8k8/https://lh3.googleusercontent.com/aida-public/AB6AXuAuk1psAPI6zLzZjjKWpf6Ak8i3ggvxrOH6ZhaStngEEgsE8Jo76lKywSIwTP6k_qZZla5sYl0XRUPm_N000RNc-Gdvx2S5zYcDhHHIYKhq4GCS9umtNVo1QpRCyMDaPbvHLS5tq8mwLW6ZkRudhMyLnCQb4zRD1CAip3xZTFSJADawiF0SkG15agpGJiCcyfWPtDdfKKGQe8oVwYA7T_R2jl10DEuTxAd6FrmfjpI8QOqZuWmBOuRrEEFrL4o2XlpnAMOgAyki7bze",
+        file_url: "/favicon.ico",
       };
       setTracks((prev) => [...prev, newTrack]);
     }
@@ -117,7 +116,7 @@ export default function MusicPage() {
                   <div
                     className="w-10 h-10 rounded-lg bg-cover bg-center border border-white/10"
                     style={{
-                      backgroundImage: `url('${track.cover}')`,
+                      backgroundImage: `url('${track.file_url}')`,
                     }}
                   ></div>
                   <div className="flex-1">

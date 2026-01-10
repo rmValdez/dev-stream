@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { MOCK_MESSAGES, Message } from "./organizationData";
+import { USER_PROFILE } from "../../data/userProfile";
 
 const PAGE_SIZE = 20;
 
@@ -93,9 +94,8 @@ export default function ChatRoom() {
     const newMessage: Message = {
       id: Date.now().toString(),
       user: {
-        name: "Dev_Lead (You)",
-        avatar:
-          "https://replicate.delivery/pbxt/JR3pX7O7l5O4TfL8g6e4k8g8k8k8k8k8k8k8k8k8k8k8k8k8/https://lh3.googleusercontent.com/aida-public/AB6AXuC2Tkx2dc7TbK-Cx0HB2u64H6Rh7off1CUQYFWVPmJ14y7mZy29upnjlzPfjlHOrkkVY8GbQWt6f9W7kcYGN2yz2y-yEdtCFRDWKpcbpDPtPVF6DXyHTxHNBK3It5KQFUJGxtCu3E_vn7cn4qjAOHpTm4Mn_Gb6h1lbI0AWVqy53kial7DzWi2PvHxbZoKFF3Y1Q70WpDVMmeuapDgtDvq-JZDwkKKlQa1oNe6njTX2EdrSiSWWKXXG19lojDd4OyxrUnaNrfHS2g6c",
+        name: `${USER_PROFILE.username} (You)`,
+        avatar: USER_PROFILE.avatar,
         color: "text-primary",
       },
       content: inputValue,

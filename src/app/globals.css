@@ -31,6 +31,13 @@
     background: rgba(10, 12, 13, 0.85);
     backdrop-filter: blur(16px);
   }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 :root {

@@ -1,9 +1,14 @@
+import { USER_PROFILE } from "../../data/userProfile";
+
 export interface User {
   id: string;
   name: string;
+  username?: string;
   role: string;
   status: "online" | "offline" | "dnd";
   avatar: string;
+  access_token?: string;
+  refresh_token?: string;
 }
 
 export interface Message {
@@ -65,10 +70,7 @@ const COLORS = [
   "text-orange-400",
 ];
 
-const AVATARS = [
-  "https://replicate.delivery/pbxt/JR3pX7O7l5O4TfL8g6e4k8g8k8k8k8k8k8k8k8k8k8k8k8k8/https://lh3.googleusercontent.com/aida-public/AB6AXuC2Tkx2dc7TbK-Cx0HB2u64H6Rh7off1CUQYFWVPmJ14y7mZy29upnjlzPfjlHOrkkVY8GbQWt6f9W7kcYGN2yz2y-yEdtCFRDWKpcbpDPtPVF6DXyHTxHNBK3It5KQFUJGxtCu3E_vn7cn4qjAOHpTm4Mn_Gb6h1lbI0AWVqy53kial7DzWi2PvHxbZoKFF3Y1Q70WpDVMmeuapDgtDvq-JZDwkKKlQa1oNe6njTX2EdrSiSWWKXXG19lojDd4OyxrUnaNrfHS2g6c",
-  "https://replicate.delivery/pbxt/JR3pX7O7l5O4TfL8g6e4k8g8k8k8k8k8k8k8k8k8k8k8k8k8/https://lh3.googleusercontent.com/aida-public/AB6AXuAuk1psAPI6zLzZjjKWpf6Ak8i3ggvxrOH6ZhaStngEEgsE8Jo76lKywSIwTP6k_qZZla5sYl0XRUPm_N000RNc-Gdvx2S5zYcDhHHIYKhq4GCS9umtNVo1QpRCyMDaPbvHLS5tq8mwLW6ZkRudhMyLnCQb4zRD1CAip3xZTFSJADawiF0SkG15agpGJiCcyfWPtDdfKKGQe8oVwYA7T_R2jl10DEuTxAd6FrmfjpI8QOqZuWmBOuRrEEFrL4o2XlpnAMOgAyki7bze",
-];
+const AVATARS = ["/favicon.ico", "/favicon.ico"];
 
 const MESSAGE_TEMPLATES = [
   "Has anyone reviewed the latest PR?",
@@ -97,19 +99,32 @@ const STATUSES: ("online" | "offline" | "dnd")[] = [
 ];
 
 const generateUsers = (count: number): User[] => {
-  return Array.from({ length: count }, (_, i) => {
+  const generated = Array.from({ length: count }, (_, i) => {
     const name = NAMES[Math.floor(Math.random() * NAMES.length)];
     const role = ROLES[Math.floor(Math.random() * ROLES.length)];
     const status = STATUSES[Math.floor(Math.random() * STATUSES.length)];
 
     return {
-      id: `${i + 1}`,
+      id: `${i + 2}`,
       name: `${name}_${role.split(" ")[0]}`,
+      username: name.toLowerCase() + (i + 2),
       role: role,
       status: status,
       avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)],
     };
   });
+
+  // Prepend the detailed mock user
+  const currentUser: User = {
+    id: USER_PROFILE.id.toString(),
+    name: USER_PROFILE.first_name + " " + USER_PROFILE.last_name,
+    username: USER_PROFILE.username,
+    role: USER_PROFILE.role,
+    status: "online",
+    avatar: USER_PROFILE.avatar,
+  };
+
+  return [currentUser, ...generated];
 };
 
 const generateMessages = (count: number): Message[] => {
@@ -118,7 +133,9 @@ const generateMessages = (count: number): Message[] => {
   baseTime.setHours(9, 0, 0, 0); // Start at 9:00 AM today
 
   for (let i = 0; i < count; i++) {
-    const isSystem = Math.random() > 0.95;
+    const isMe = Math.random() > 0.95; // 5% chance it's the current user
+    const isSystem = !isMe && Math.random() > 0.95;
+
     const name = NAMES[Math.floor(Math.random() * NAMES.length)];
     const role = ROLES[Math.floor(Math.random() * ROLES.length)];
     const content =
@@ -138,11 +155,19 @@ const generateMessages = (count: number): Message[] => {
     messages.push({
       id: `${i + 1}`,
       user: {
-        name: isSystem ? "System" : `${name}_${role.split(" ")[0]}`,
-        avatar: isSystem
+        name: isMe
+          ? `${USER_PROFILE.username} (You)`
+          : isSystem
+          ? "System"
+          : `${name}_${role.split(" ")[0]}`,
+        avatar: isMe
+          ? USER_PROFILE.avatar
+          : isSystem
           ? ""
           : AVATARS[Math.floor(Math.random() * AVATARS.length)],
-        color: isSystem
+        color: isMe
+          ? "text-primary"
+          : isSystem
           ? "text-primary"
           : COLORS[Math.floor(Math.random() * COLORS.length)],
       },

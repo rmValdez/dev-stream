@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import PageWrapper from "@/components/PageWrapper/PageWrapper";
+import PageWrapper from "@/components/ReusableComponent/PageWrapperComponent";
 
 import PageHeader from "@/components/PageHeader/PageHeader";
 
