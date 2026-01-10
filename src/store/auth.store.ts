@@ -1,42 +1,47 @@
 "use client";
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-
-interface User {
-  id: string;
-  email: string;
-  username: string;
-  name?: string;
-  isEmailVerified?: boolean;
-}
+import { authService } from "@/services/authService";
+import { User } from "@/components/Organization/organizationData";
 
 interface AuthState {
-  accessToken: string | null;
-  refreshToken: string | null;
+  isAuthenticated: boolean;
   user: User | null;
-  setAuth: (accessToken: string, refreshToken: string, user: User) => void;
-  clearAuth: () => void;
+  login: (username: string, password: string) => Promise<boolean>;
+  logout: () => void;
+  checkAuth: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      accessToken: "mock-access-token",
-      refreshToken: "mock-refresh-token",
-      user: {
-        id: "1",
-        email: "dev@example.com",
-        username: "DevMaster",
-        name: "Developer",
-      },
-      setAuth: (accessToken, refreshToken, user) =>
-        set({ accessToken, refreshToken, user }),
-      clearAuth: () =>
-        set({ accessToken: null, refreshToken: null, user: null }),
-    }),
-    {
-      name: "auth-storage",
+export const useAuthStore = create<AuthState>((set) => ({
+  isAuthenticated: false,
+  user: null,
+
+  login: async (username, password) => {
+    const success = await authService.login(username, password);
+    if (success) {
+      set({
+        isAuthenticated: true,
+        user: authService.getUser() as User,
+      });
+      return true;
     }
-  )
-);
+    return false;
+  },
+
+  logout: () => {
+    authService.logout();
+    set({ isAuthenticated: false, user: null });
+  },
+
+  checkAuth: () => {
+    const isAuth = authService.isAuthenticated();
+    if (isAuth) {
+      set({
+        isAuthenticated: true,
+        user: authService.getUser() as User,
+      });
+    } else {
+      set({ isAuthenticated: false, user: null });
+    }
+  },
+}));

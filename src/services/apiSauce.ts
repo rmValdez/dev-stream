@@ -45,10 +45,10 @@ apiClient.axiosInstance.interceptors.response.use(
             }
           );
 
-          const { accessToken } = refreshRes.data;
-          updateAccessToken(accessToken);
+          const { access_token } = refreshRes.data;
+          updateAccessToken(access_token);
 
-          originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+          originalRequest.headers["Authorization"] = `Bearer ${access_token}`;
           return apiClient.axiosInstance(originalRequest);
         }
       } catch {

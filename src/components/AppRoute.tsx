@@ -10,18 +10,21 @@ interface ProtectedRouteProps {
 
 export default function AppRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
-  const { accessToken, user } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     const checkAuth = () => {
-      if (!accessToken || !user) {
-        // For development, we'll allow access even without a token
-        // Remove this bypass in production
+      // In production, force login if not authenticated
+      if (!isAuthenticated) {
         if (process.env.NODE_ENV === "production") {
           router.push("/login");
         } else {
-          setIsChecking(false);
+          // In dev, we might verify token existence via service if needed,
+          // but relying on store's isAuthenticated is cleaner.
+          // If store says false, we redirect.
+          // However, to match previous logic (dev bypass):
+          setIsChecking(false); // Just allow it in dev for now
         }
       } else {
         setIsChecking(false);
@@ -30,7 +33,7 @@ export default function AppRoute({ children }: ProtectedRouteProps) {
 
     const timer = setTimeout(checkAuth, 100);
     return () => clearTimeout(timer);
-  }, [accessToken, user, router]);
+  }, [isAuthenticated, user, router]);
 
   if (isChecking) {
     return (

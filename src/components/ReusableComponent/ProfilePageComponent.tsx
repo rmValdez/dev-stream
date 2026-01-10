@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { USER_PROFILE } from "../../data/userProfile";
 
-export default function ProfilePage() {
+export default function ProfilePageComponent() {
   return (
     <div className="flex-1 p-8 overflow-y-auto h-full">
       <div className="max-w-4xl mx-auto space-y-8">

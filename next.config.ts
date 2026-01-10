@@ -1,8 +1,21 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Required for GitHub Pages
+  output: "export",
+  basePath: "/dev-stream",
+  assetPrefix: "/dev-stream/",
+
+  // Replicate / AI images MUST bypass Next optimizer
   images: {
+    unoptimized: true,
     remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3002",
+        pathname: "/**",
+      },
       {
         protocol: "https",
         hostname: "replicate.delivery",
