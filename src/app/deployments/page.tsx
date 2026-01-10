@@ -19,7 +19,7 @@ export default function DeploymentsPage() {
           <div className="mt-8 space-y-3">
             {[1, 2].map((i) => (
               <div
-                key={i}
+                key={`deploy-${i}`}
                 className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-lg"
               >
                 <div className="flex items-center gap-3">

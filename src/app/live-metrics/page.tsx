@@ -27,7 +27,7 @@ export default function MetricsPage() {
           <div className="mt-8 grid grid-cols-3 gap-6">
             {metrics.map((val, i) => (
               <div
-                key={i}
+                key={`metric-${i}`}
                 className="h-32 bg-white/5 border border-white/5 rounded-xl flex flex-col items-center justify-center"
               >
                 <div className="text-xs text-white/30 uppercase mb-2">
@@ -39,7 +39,7 @@ export default function MetricsPage() {
             {metrics.length === 0 &&
               [1, 2, 3].map((i) => (
                 <div
-                  key={i}
+                  key={`skeleton-${i}`}
                   className="h-32 bg-white/5 border border-white/5 rounded-xl animate-pulse"
                 ></div>
               ))}
