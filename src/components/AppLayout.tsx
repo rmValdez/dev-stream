@@ -50,11 +50,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const renderNavItem = (item: NavItem) => {
     const hasChildren = item.children && item.children.length > 0;
-    const isExpanded = expandedMenus.includes(item.label);
+    // Force default state ("Social Mixes" expanded) on server/initial render to match hydration
+    const isExpanded = mounted
+      ? expandedMenus.includes(item.label)
+      : ["Social Mixes"].includes(item.label);
     const active = item.href ? isActive(item.href) : isMenuActive(item);
 
     return (
-      <div key={item.label} className="group">
+      <div key={`${item.label}-${item.href}`} className="group">
         <div
           onClick={() => {
             if (hasChildren) {
@@ -69,11 +72,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
               : "text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.03]"
           }`}
         >
-          {item.iconName && (
+          {/* {item.iconName && (
             <span className="material-symbols-outlined text-xl shrink-0">
               {item.iconName}
             </span>
-          )}
+          )} */}
           <span className="text-sm font-semibold tracking-wide">
             {item.label}
           </span>
@@ -83,7 +86,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 isExpanded ? "rotate-180" : ""
               }`}
             >
-              expand_more
+              {isExpanded ? "^" : ">"}
             </span>
           )}
         </div>
@@ -92,7 +95,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <div className="pl-12 space-y-2 mt-1 mb-4">
             {item.children?.map((child) => (
               <a
-                key={child.label}
+                key={`${child.label}-${child.href}`}
                 onClick={() => child.href && router.push(child.href)}
                 className={`block text-xs font-bold transition-colors uppercase tracking-widest cursor-pointer ${
                   isActive(child.href)
@@ -197,7 +200,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <div className="space-y-3 px-4">
                 {TRENDING_REPOS.map((repo) => (
                   <a
-                    key={repo.label}
+                    key={`${repo.label}-${repo.href}`}
                     href={repo.href}
                     target="_blank"
                     rel="noopener noreferrer"

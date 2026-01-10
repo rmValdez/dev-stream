@@ -64,7 +64,7 @@ export default function ProfilePageComponent() {
             { label: "Reputation", value: "98.5%", icon: "verified" },
           ].map((stat, i) => (
             <div
-              key={i}
+              key={`stat-${i}-${stat.label}`}
               className="p-6 rounded-xl bg-black/20 border border-white/5 flex items-center gap-4"
             >
               <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center text-white/40">
