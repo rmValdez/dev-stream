@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .glitch-text {
+    text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9;
+  }
+  .mesh-gradient {
+    background-color: #0a0c0d;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(0, 224, 245, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(39, 57, 58, 0.2) 0px, transparent 50%);
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #0a0c0d;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #27393a;
+    border-radius: 10px;
+  }
+  .ds-logo-font {
+    font-family: var(--font-display);
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+  .terminal-glass {
+    background: rgba(10, 12, 13, 0.85);
+    backdrop-filter: blur(16px);
+  }
+}
+
+:root {
+  --background: #f1f2f4;
+  --foreground: #0f172a;
+}
+
+.dark {
+  --background: #0a0c0d;
+  --foreground: #f8fafc;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-display);
+  overflow: hidden;
+}
+
+.sidebar-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sidebar {
+  width: 16rem;
+}
+
+.right-sidebar {
+  width: 20rem;
+}
