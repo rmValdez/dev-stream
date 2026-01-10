@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import PageWrapper from "@/components/PageWrapper/PageWrapper";
 
+import PageHeader from "@/components/PageHeader/PageHeader";
+
 export default function MetricsPage() {
   const [metrics, setMetrics] = useState<number[]>([]);
 
@@ -15,9 +17,7 @@ export default function MetricsPage() {
   return (
     <PageWrapper>
       <div className="space-y-6">
-        <h1 className="text-2xl font-black uppercase tracking-widest text-primary glitch-text">
-          Live Metrics
-        </h1>
+        <PageHeader title="Live Metrics" />
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-xl">
           <p className="text-white/60 font-mono text-sm leading-relaxed">
             [SYSTEM] Analyzing real-time data packets...

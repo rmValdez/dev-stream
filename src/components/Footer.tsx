@@ -1,10 +1,18 @@
 "use client";
 
 import React from "react";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isMusicPage = pathname === "/social-mixes/music";
+
   return (
-    <footer className="fixed bottom-0 left-0 right-0 h-8 bg-white/95 dark:bg-background-dark/95 border-t border-black/5 dark:border-white/5 backdrop-blur-xl z-50 flex items-center px-4 overflow-hidden">
+    <footer
+      className={`fixed left-0 right-0 h-8 bg-white/95 dark:bg-background-dark/95 border-t border-black/5 dark:border-white/5 backdrop-blur-xl z-50 flex items-center px-4 overflow-hidden transition-all duration-300 ${
+        isMusicPage ? "bottom-[90px]" : "bottom-0"
+      }`}
+    >
       <div className="flex w-full items-center justify-between gap-6 text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 dark:text-white/30">
         <div className="flex items-center gap-8 shrink-0">
           <div className="flex items-center gap-3">
