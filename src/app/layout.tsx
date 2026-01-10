@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import React from "react";
 import { Space_Grotesk, Space_Mono } from "next/font/google";
 import { ThemeProvider } from "@/providers/theme-provider";
 import AppLayout from "@/components/AppLayout";
@@ -27,17 +28,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        />
-      </head>
       <body
         className={`${spaceGrotesk.variable} ${spaceMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <AppLayout>{children}</AppLayout>
+          <React.Suspense fallback={<div className="min-h-screen bg-black" />}>
+            <AppLayout>{children}</AppLayout>
+          </React.Suspense>
         </ThemeProvider>
       </body>
     </html>
