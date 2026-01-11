@@ -1,11 +1,17 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { socketService } from '@/services/socket.service';
-import { JobStatusUpdate } from '@/interfaces/socket.interface';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { socketService } from "@/services/socket.service";
+import { JobStatusUpdate } from "@/interfaces/socket.interface";
 
 export interface JobActivity {
-  type: 'evaluating' | 'importing' | 'skipped' | 'imported' | 'failed' | 'syncing';
+  type:
+    | "evaluating"
+    | "importing"
+    | "skipped"
+    | "imported"
+    | "failed"
+    | "syncing";
   productId?: string;
   productName?: string;
   score?: number;
@@ -67,9 +73,11 @@ export function useJobProgress(options: UseJobProgressOptions = {}) {
     socketService.connect();
 
     // Subscribe to connection state changes
-    const unsubscribeConnection = socketService.onConnectionChange((connected) => {
-      setIsConnected(connected);
-    });
+    const unsubscribeConnection = socketService.onConnectionChange(
+      (connected) => {
+        setIsConnected(connected);
+      }
+    );
 
     return () => {
       unsubscribeConnection();
@@ -93,7 +101,7 @@ export function useJobProgress(options: UseJobProgressOptions = {}) {
     // Initialize job state
     setCurrentJob({
       jobId,
-      status: 'PENDING',
+      status: "PENDING",
       processed: 0,
       total: 0,
       success: 0,
@@ -107,86 +115,96 @@ export function useJobProgress(options: UseJobProgressOptions = {}) {
     });
 
     // Subscribe to updates
-    unsubscribeRef.current = socketService.subscribeToJob(jobId, (data: JobStatusUpdate) => {
-      const progress = parseJobUpdate(data);
+    unsubscribeRef.current = socketService.subscribeToJob(
+      jobId,
+      (data: JobStatusUpdate) => {
+        const progress = parseJobUpdate(data);
 
-      // Generate activity entries based on changes
-      const prev = prevValuesRef.current;
-      const newActivities: JobActivity[] = [];
+        // Generate activity entries based on changes
+        const prev = prevValuesRef.current;
+        const newActivities: JobActivity[] = [];
 
-      // Detect new successes
-      const successDelta = progress.success - prev.success;
-      for (let i = 0; i < successDelta; i++) {
-        newActivities.push({
-          type: 'imported',
-          message: 'Imported successfully',
-          timestamp: Date.now() - (successDelta - i - 1) * 10,
-        });
-      }
-
-      // Detect new skipped
-      const skippedDelta = progress.skipped - prev.skipped;
-      for (let i = 0; i < skippedDelta; i++) {
-        newActivities.push({
-          type: 'skipped',
-          message: 'Skipped (score below threshold)',
-          timestamp: Date.now() - (skippedDelta - i - 1) * 10,
-        });
-      }
-
-      // Detect new failures
-      const failedDelta = progress.failed - prev.failed;
-      for (let i = 0; i < failedDelta; i++) {
-        newActivities.push({
-          type: 'failed',
-          message: 'Import failed',
-          timestamp: Date.now() - (failedDelta - i - 1) * 10,
-        });
-      }
-
-      // Show "evaluating" state when processing increases but outcomes haven't caught up
-      const totalOutcomes = progress.success + progress.failed + progress.skipped;
-      const prevTotalOutcomes = prev.success + prev.failed + prev.skipped;
-      if (progress.processed > prev.processed && totalOutcomes === prevTotalOutcomes) {
-        newActivities.push({
-          type: 'evaluating',
-          message: `Evaluating product ${progress.processed} of ${progress.total}...`,
-          timestamp: Date.now(),
-        });
-      }
-
-      // Add new activities to log (keep most recent 50)
-      if (newActivities.length > 0) {
-        activityLogRef.current = [...newActivities, ...activityLogRef.current].slice(0, 50);
-      }
-
-      // Update previous values
-      prevValuesRef.current = {
-        success: progress.success,
-        failed: progress.failed,
-        skipped: progress.skipped,
-        processed: progress.processed,
-      };
-
-      // Add activity log to progress
-      const progressWithLog: JobProgress = {
-        ...progress,
-        activityLog: activityLogRef.current,
-      };
-
-      setCurrentJob(progressWithLog);
-
-      // Call callbacks
-      if (progress.isComplete) {
-        if (progress.error) {
-          optionsRef.current.onError?.(progress.error);
-        } else {
-          optionsRef.current.onComplete?.(progressWithLog);
+        // Detect new successes
+        const successDelta = progress.success - prev.success;
+        for (let i = 0; i < successDelta; i++) {
+          newActivities.push({
+            type: "imported",
+            message: "Imported successfully",
+            timestamp: Date.now() - (successDelta - i - 1) * 10,
+          });
         }
-      } else {
-        optionsRef.current.onProgress?.(progressWithLog);
+
+        // Detect new skipped
+        const skippedDelta = progress.skipped - prev.skipped;
+        for (let i = 0; i < skippedDelta; i++) {
+          newActivities.push({
+            type: "skipped",
+            message: "Skipped (score below threshold)",
+            timestamp: Date.now() - (skippedDelta - i - 1) * 10,
+          });
+        }
+
+        // Detect new failures
+        const failedDelta = progress.failed - prev.failed;
+        for (let i = 0; i < failedDelta; i++) {
+          newActivities.push({
+            type: "failed",
+            message: "Import failed",
+            timestamp: Date.now() - (failedDelta - i - 1) * 10,
+          });
+        }
+
+        // Show "evaluating" state when processing increases but outcomes haven't caught up
+        const totalOutcomes =
+          progress.success + progress.failed + progress.skipped;
+        const prevTotalOutcomes = prev.success + prev.failed + prev.skipped;
+        if (
+          progress.processed > prev.processed &&
+          totalOutcomes === prevTotalOutcomes
+        ) {
+          newActivities.push({
+            type: "evaluating",
+            message: `Evaluating product ${progress.processed} of ${progress.total}...`,
+            timestamp: Date.now(),
+          });
+        }
+
+        // Add new activities to log (keep most recent 50)
+        if (newActivities.length > 0) {
+          activityLogRef.current = [
+            ...newActivities,
+            ...activityLogRef.current,
+          ].slice(0, 50);
+        }
+
+        // Update previous values
+        prevValuesRef.current = {
+          success: progress.success,
+          failed: progress.failed,
+          skipped: progress.skipped,
+          processed: progress.processed,
+        };
+
+        // Add activity log to progress
+        const progressWithLog: JobProgress = {
+          ...progress,
+          activityLog: activityLogRef.current,
+        };
+
+        setCurrentJob(progressWithLog);
+
+        // Call callbacks
+        if (progress.isComplete) {
+          if (progress.error) {
+            optionsRef.current.onError?.(progress.error);
+          } else {
+            optionsRef.current.onComplete?.(progressWithLog);
+          }
+        } else {
+          optionsRef.current.onProgress?.(progressWithLog);
+        }
       }
-    });
+    );
   }, []);
 
   // Unsubscribe from current job
@@ -220,9 +238,9 @@ function parseJobUpdate(data: JobStatusUpdate): JobProgress {
   const checkpoint = payload?.checkpoint as Record<string, unknown> | undefined;
   const activity = payload?.activity as JobActivity | undefined;
 
-  const status = data.status || job?.status || 'UNKNOWN';
-  const isComplete = ['DONE', 'FAILED', 'CANCELLED'].includes(status);
-  const isRunning = ['PENDING', 'PROCESSING', 'RUNNING'].includes(status);
+  const status = data.status || job?.status || "UNKNOWN";
+  const isComplete = ["DONE", "FAILED", "CANCELLED"].includes(status);
+  const isRunning = ["PENDING", "PROCESSING", "RUNNING"].includes(status);
 
   const processed = progress?.processed ?? job?.processedItems ?? 0;
   const total = progress?.total ?? job?.totalItems ?? 0;
@@ -249,7 +267,9 @@ function parseJobUpdate(data: JobStatusUpdate): JobProgress {
     percentage,
     error:
       data.error ||
-      (status === 'FAILED' ? ((payload as Record<string, unknown>)?.error as string) : undefined),
+      (status === "FAILED"
+        ? ((payload as Record<string, unknown>)?.error as string)
+        : undefined),
     isComplete,
     isRunning,
     activity: activity ? { ...activity, timestamp: Date.now() } : undefined,
@@ -260,14 +280,22 @@ function parseJobUpdate(data: JobStatusUpdate): JobProgress {
 export function useAllJobsProgress(onUpdate?: (data: JobStatusUpdate) => void) {
   const [jobs, setJobs] = useState<Map<string, JobProgress>>(new Map());
   const [isConnected, setIsConnected] = useState(false);
+  const onUpdateRef = useRef(onUpdate);
+
+  // Keep ref updated
+  useEffect(() => {
+    onUpdateRef.current = onUpdate;
+  }, [onUpdate]);
 
   useEffect(() => {
     socketService.connect();
 
     // Use onConnectionChange to avoid sync setState in effect
-    const unsubscribeConnection = socketService.onConnectionChange((connected) => {
-      setIsConnected(connected);
-    });
+    const unsubscribeConnection = socketService.onConnectionChange(
+      (connected) => {
+        setIsConnected(connected);
+      }
+    );
     // Initial state (wrapped in setTimeout to avoid sync setState warning)
     const initialTimer = setTimeout(() => {
       setIsConnected(socketService.isConnected());
@@ -280,7 +308,7 @@ export function useAllJobsProgress(onUpdate?: (data: JobStatusUpdate) => void) {
         newMap.set(data.jobId, progress);
         return newMap;
       });
-      onUpdate?.(data);
+      onUpdateRef.current?.(data);
     });
 
     const interval = setInterval(() => {
@@ -293,7 +321,7 @@ export function useAllJobsProgress(onUpdate?: (data: JobStatusUpdate) => void) {
       unsubscribe();
       unsubscribeConnection();
     };
-  }, [onUpdate]);
+  }, []); // No dependency on onUpdate - use ref instead
 
   return { jobs, isConnected };
 }

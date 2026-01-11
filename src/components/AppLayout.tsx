@@ -14,6 +14,7 @@ import Footer from "@/components/Footer";
 import TerminalOverlay from "@/components/TerminalOverlay/TerminalOverlay";
 import AppRoute from "@/components/AppRoute";
 import SystemStatus from "@/components/SystemStatus/SystemStatus";
+import { authService } from "@/services/authService";
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -28,12 +29,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
     useUIStore();
 
   const [mounted, setMounted] = useState(false);
+  const checkAuth = useAuthStore((state) => state.checkAuth);
 
-  // Hydration safety
+  // Hydration safety + restore auth state from localStorage
   useEffect(() => {
+    checkAuth(); // Restore auth state from localStorage on mount
     const timer = setTimeout(() => setMounted(true), 0);
     return () => clearTimeout(timer);
-  }, []);
+  }, [checkAuth]);
 
   const isActive = (href?: string) => {
     if (!href) return false;
@@ -72,11 +75,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
               : "text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.03]"
           }`}
         >
-          {/* {item.iconName && (
+          {item.iconName && (
             <span className="material-symbols-outlined text-xl shrink-0">
               {item.iconName}
             </span>
-          )} */}
+          )}
           <span className="text-sm font-semibold tracking-wide">
             {item.label}
           </span>
@@ -86,7 +89,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 isExpanded ? "rotate-180" : ""
               }`}
             >
-              {isExpanded ? "^" : ">"}
+              expand_more
             </span>
           )}
         </div>
@@ -137,14 +140,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
             {/* Logo Section */}
             <div className="flex items-center gap-4 px-1 py-1">
               <button
-                className="relative w-12 h-12 rounded-full border border-slate-900/20 dark:border-white/20 bg-slate-900 dark:bg-black flex items-center justify-center flex-shrink-0 shadow-2xl transition-all hover:scale-105 active:scale-95 group overflow-hidden"
+                className="relative w-12 h-12 rounded-xl border border-slate-900/20 dark:border-white/20 bg-slate-900 dark:bg-black flex items-center justify-center flex-shrink-0 shadow-2xl transition-all hover:scale-105 active:scale-95 group overflow-hidden"
                 onClick={toggleTheme}
               >
-                <div className="relative z-10 ds-logo-font font-bold flex items-center justify-center text-white">
-                  <span className="text-xl -mr-1">D</span>
-                  <span className="text-xl italic translate-y-0.5">S</span>
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo.svg" alt="DS" className="w-8 h-8" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60">
                   <span className="material-symbols-outlined text-white text-lg dark:hidden">
                     dark_mode
                   </span>
@@ -152,8 +153,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     light_mode
                   </span>
                 </div>
-                <div className="absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-black hidden dark:block"></div>
-                <div className="absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full bg-slate-400 border-2 border-white block dark:hidden"></div>
+                <div className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-primary border-2 border-black hidden dark:block"></div>
+                <div className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-slate-400 border-2 border-white block dark:hidden"></div>
               </button>
               <div className="flex flex-col">
                 <span className="text-[12px] font-bold tracking-[0.4em] uppercase font-mono truncate text-slate-900 dark:text-white">
@@ -204,9 +205,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     href={repo.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors truncate flex items-center gap-2"
+                    className="text-xs text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors truncate flex items-center gap-2 group/repo"
                   >
-                    <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-white/20"></span>
+                    <span className="material-symbols-outlined text-[14px] opacity-40 group-hover/repo:opacity-100 transition-opacity">
+                      {repo.iconName || "link"}
+                    </span>
                     {repo.label}
                   </a>
                 ))}
@@ -215,11 +218,20 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </div>
 
           <div className="pt-6">
-            <button className="w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-black text-sm font-bold rounded-lg uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2">
+            <button className="w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-black text-sm font-bold rounded-lg uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg mb-3">
               <span className="material-symbols-outlined text-sm font-bold">
                 add
               </span>
               New Session
+            </button>
+            <button
+              onClick={() => {
+                authService.logout();
+              }}
+              className="w-full py-2.5 border border-black/10 dark:border-white/10 text-slate-500 dark:text-white/40 text-[10px] font-bold rounded-lg uppercase tracking-widest hover:text-red-500 dark:hover:text-red-400 hover:border-red-500/50 transition-all flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined text-sm">logout</span>
+              Terminate Session
             </button>
           </div>
         </aside>

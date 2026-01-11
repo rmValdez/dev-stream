@@ -67,11 +67,6 @@ export default function ProfilePage() {
               key={i}
               className="p-6 rounded-xl bg-black/20 border border-white/5 flex items-center gap-4"
             >
-              <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center text-white/40">
-                <span className="material-symbols-outlined text-2xl">
-                  {stat.icon}
-                </span>
-              </div>
               <div>
                 <p className="text-xs text-white/30 uppercase tracking-widest font-bold">
                   {stat.label}

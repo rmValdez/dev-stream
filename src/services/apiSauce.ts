@@ -6,11 +6,11 @@ import {
   updateAccessToken,
 } from "./session.service";
 import axios from "axios";
-import { ALLINONE } from "../config/environment";
+import { DEV_STREAM } from "../config/environment";
 
 // Create apiClient instance
 const apiClient: ApisauceInstance = create({
-  baseURL: ALLINONE.API_BASE_URL,
+  baseURL: DEV_STREAM.API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -39,7 +39,7 @@ apiClient.axiosInstance.interceptors.response.use(
         const refreshToken = getRefreshToken();
         if (refreshToken) {
           const refreshRes = await axios.post(
-            `${ALLINONE.API_BASE_URL}/auth/refresh-token`,
+            `${DEV_STREAM.API_BASE_URL}/auth/refresh-token`,
             {
               refreshToken,
             }

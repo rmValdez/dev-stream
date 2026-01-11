@@ -46,7 +46,9 @@ const updateAccessToken = (token: string): void => {
         localStorage.setItem("auth-storage", JSON.stringify(parsed));
       }
     }
-  } catch {}
+  } catch (error) {
+    console.warn("[session.service] Failed to update auth-storage:", error);
+  }
 };
 
 export { getAuthToken, getRefreshToken, clearAuthTokens, updateAccessToken };

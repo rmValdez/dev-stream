@@ -24,35 +24,16 @@ export const authService = {
         refresh_token: refreshToken,
       };
 
+      // Store in primary location
       localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify({
           isAuthenticated: true,
           user: userWithTokens,
-          // Keeping root level for backward compat if needed by other services briefly,
-          // but user request implies user object usually.
-          // Actually, let's stick to the structure they might expect if they said "go to user profile".
-          // But for safety with the manual edits in socket/api services which look for root or state,
-          // I should be careful.
-          // Wait, the manual code in socket.service.ts (Step 2427) checks: parsed?.state?.access_token.
-          // That implies they might be using a store persistence that wraps it in 'state'.
-          // BUT authService uses 'devstream_auth' key (STORAGE_KEY), while socket service checks 'auth-storage' (Zustand persist).
-
-          // The user manually created `authSession.service.ts` which checks `auth-storage` OR `access_token` direct key.
-          // My `authService` is writing to `devstream_auth`.
-          // This is a disconnect.
         })
       );
 
-      // We must sync with the 'auth-storage' that the user seems to be using/expecting via Zustand persist
-      // OR we update authService to use the same keys.
-      // Given the user manually edited `apiSauce` and `socket.service` to look for keys,
-      // I should align.
-
-      // Taking a closer look at the user's `authSession.service.ts`:
-      // It looks for `auth-storage` (Zustand) OR `localStorage.getItem("access_token")`.
-
-      // I will update authService to write to the locations the USER's new code expects.
+      // Also store in expected locations for session.service.ts compatibility
       localStorage.setItem("access_token", accessToken);
       localStorage.setItem("refresh_token", refreshToken);
       localStorage.setItem("user", JSON.stringify(userWithTokens));
@@ -64,6 +45,11 @@ export const authService = {
 
   logout: () => {
     localStorage.removeItem(STORAGE_KEY);
+    // Clear all auth-related keys for complete logout
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("auth-storage");
     window.location.href = "/login";
   },
 

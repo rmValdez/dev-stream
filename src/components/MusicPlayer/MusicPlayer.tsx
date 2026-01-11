@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function MusicPlayer() {
   return (
-    <footer className="fixed bottom-0 left-0 right-0 h-[90px] bg-black border-t border-white/10 z-[60] flex items-center px-4">
+    <footer className="fixed bottom-0 left-0 right-0 h-[90px] bg-slate-900 dark:bg-black border-t border-black/10 dark:border-white/10 z-[60] flex items-center px-4">
       <div className="flex justify-between items-center w-full">
         {/* Track Info */}
         <div className="flex items-center gap-4 min-w-[180px] w-1/3">
@@ -27,7 +27,7 @@ export default function MusicPlayer() {
               SYNTH_WAVE_INIT.EXE
             </a>
             <a
-              className="text-[11px] text-spotify-lightgrey hover:underline hover:text-white truncate"
+              className="text-[11px] text-slate-300 dark:text-spotify-lightgrey hover:underline hover:text-white truncate"
               href="#"
             >
               Sarah_Dev x Logic_Gate

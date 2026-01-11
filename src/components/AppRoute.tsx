@@ -15,17 +15,9 @@ export default function AppRoute({ children }: ProtectedRouteProps) {
 
   useEffect(() => {
     const checkAuth = () => {
-      // In production, force login if not authenticated
       if (!isAuthenticated) {
-        if (process.env.NODE_ENV === "production") {
-          router.push("/login");
-        } else {
-          // In dev, we might verify token existence via service if needed,
-          // but relying on store's isAuthenticated is cleaner.
-          // If store says false, we redirect.
-          // However, to match previous logic (dev bypass):
-          setIsChecking(false); // Just allow it in dev for now
-        }
+        // Redirect to login if not authenticated (both dev and production)
+        router.push("/login");
       } else {
         setIsChecking(false);
       }

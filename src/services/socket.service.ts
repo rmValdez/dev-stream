@@ -2,25 +2,8 @@
 
 import { io, Socket } from "socket.io-client";
 import { JobStatusUpdate } from "@/interfaces/socket.interface";
-
-const SOCKET_URL = "http://localhost:3002";
-
-// Token management - same as api.ts
-const getAuthToken = (): string | null => {
-  if (typeof window === "undefined") return null;
-  try {
-    const authStorage = localStorage.getItem("auth-storage");
-    if (authStorage) {
-      const parsed = JSON.parse(authStorage);
-      if (parsed?.state?.access_token) {
-        return parsed.state.access_token;
-      }
-    }
-    return localStorage.getItem("access_token");
-  } catch {
-    return localStorage.getItem("access_token");
-  }
-};
+import { getAuthToken } from "./session.service";
+import { DEV_STREAM } from "@/config/environment";
 
 class SocketService {
   private socket: Socket | null = null;
@@ -45,9 +28,9 @@ class SocketService {
       return null;
     }
 
-    console.log("[SocketService] Connecting to", SOCKET_URL);
+    console.log("[SocketService] Connecting to", DEV_STREAM.SOCKET_URL);
 
-    this.socket = io(SOCKET_URL, {
+    this.socket = io(DEV_STREAM.SOCKET_URL, {
       // Use extraHeaders with polling-first transport order
       // Headers are sent during polling handshake, then connection upgrades to WebSocket
       extraHeaders: {

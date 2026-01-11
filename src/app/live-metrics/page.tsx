@@ -18,19 +18,19 @@ export default function MetricsPage() {
     <PageWrapper>
       <div className="space-y-6">
         <PageHeader title="Live Metrics" />
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-xl">
-          <p className="text-white/60 font-mono text-sm leading-relaxed">
+        <div className="bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-8 backdrop-blur-xl transition-colors">
+          <p className="text-slate-600 dark:text-white/60 font-mono text-sm leading-relaxed">
             [SYSTEM] Analyzing real-time data packets...
             <br />
             System performance at 98.4% efficiency.
           </p>
-          <div className="mt-8 grid grid-cols-3 gap-6">
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
             {metrics.map((val, i) => (
               <div
                 key={`metric-${i}`}
-                className="h-32 bg-white/5 border border-white/5 rounded-xl flex flex-col items-center justify-center"
+                className="h-32 bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl flex flex-col items-center justify-center transition-colors shadow-sm dark:shadow-none"
               >
-                <div className="text-xs text-white/30 uppercase mb-2">
+                <div className="text-xs text-slate-500 dark:text-white/30 uppercase mb-2 font-bold tracking-widest">
                   Metric {i + 1}
                 </div>
                 <div className="text-2xl font-black text-primary">{val}%</div>
@@ -40,7 +40,7 @@ export default function MetricsPage() {
               [1, 2, 3].map((i) => (
                 <div
                   key={`skeleton-${i}`}
-                  className="h-32 bg-white/5 border border-white/5 rounded-xl animate-pulse"
+                  className="h-32 bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl animate-pulse"
                 ></div>
               ))}
           </div>

@@ -118,15 +118,15 @@ export default function ChatRoom() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-black/20 border border-white/5 rounded-2xl overflow-hidden backdrop-blur-sm">
+    <div className="flex flex-col h-full bg-slate-100 dark:bg-black/20 border border-black/10 dark:border-white/5 rounded-2xl overflow-hidden backdrop-blur-sm">
       {/* Chat Header */}
-      <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center shrink-0">
+      <div className="p-4 border-b border-black/10 dark:border-white/5 bg-slate-200 dark:bg-white/5 flex justify-between items-center shrink-0">
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-primary">forum</span>
-          <span className="font-bold tracking-widest uppercase text-sm">
+          <span className="font-bold tracking-widest uppercase text-sm text-slate-900 dark:text-white">
             General Channel
           </span>
-          <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white/40">
+          <span className="text-[10px] bg-black/10 dark:bg-white/10 px-2 py-0.5 rounded text-slate-500 dark:text-white/40">
             {MOCK_MESSAGES.length +
               (displayedMessages.length > 20
                 ? displayedMessages.length - 20
@@ -167,7 +167,7 @@ export default function ChatRoom() {
             }`}
           >
             {!msg.isSystem && (
-              <div className="shrink-0 w-10 h-10 rounded-lg overflow-hidden border border-white/10">
+              <div className="shrink-0 w-10 h-10 rounded-lg overflow-hidden border border-black/10 dark:border-white/10">
                 <Image
                   src={msg.user.avatar}
                   alt={msg.user.name}
@@ -184,7 +184,7 @@ export default function ChatRoom() {
                 >
                   {msg.user.name}
                 </span>
-                <span className="text-[10px] text-white/20 font-mono">
+                <span className="text-[10px] text-slate-400 dark:text-white/20 font-mono">
                   {msg.timestamp}
                 </span>
               </div>
@@ -192,7 +192,7 @@ export default function ChatRoom() {
                 className={`text-sm leading-relaxed ${
                   msg.isSystem
                     ? "text-primary font-mono text-xs"
-                    : "text-slate-200"
+                    : "text-slate-700 dark:text-slate-200"
                 }`}
               >
                 {msg.content}
@@ -206,7 +206,7 @@ export default function ChatRoom() {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 bg-white/5 border-t border-white/5 shrink-0">
+      <div className="p-4 bg-slate-200 dark:bg-white/5 border-t border-black/10 dark:border-white/5 shrink-0">
         <div className="flex gap-4">
           <input
             type="text"
@@ -214,7 +214,7 @@ export default function ChatRoom() {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Transmission..."
-            className="flex-1 bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary/50 transition-colors font-mono text-white placeholder-white/20"
+            className="flex-1 bg-white dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary/50 transition-colors font-mono text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/20"
           />
           <button
             onClick={handleSend}
