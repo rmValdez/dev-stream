@@ -1,67 +1,65 @@
-import { USER_PROFILE } from "../data/userProfile";
+import { User } from "@/components/Organization/organizationData";
+import apiClient from "./apiSauce";
 
-const STORAGE_KEY = "devstream_auth";
+const ACCESS_TOKEN_KEY = "ds_access_token";
+const REFRESH_TOKEN_KEY = "ds_refresh_token";
+
+interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: User;
+}
 
 export const authService = {
-  login: async (username: string, password: string): Promise<boolean> => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  login: async (email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await apiClient.post("/auth/login", {
+        email,
+        password,
+      });
 
-    if (
-      username === USER_PROFILE.username &&
-      password === USER_PROFILE.password
-    ) {
-      const randomId = () =>
-        Math.random().toString(36).substring(2) +
-        Math.random().toString(36).substring(2);
+      if (response.ok && response.data) {
+        const { accessToken, refreshToken, user } =
+          response.data as LoginResponse;
 
-      const accessToken = `ey${randomId()}.${randomId()}.${randomId()}`;
-      const refreshToken = `ref${randomId()}${randomId()}`;
+        // Store tokens with unique keys
+        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 
-      const userWithTokens = {
-        ...USER_PROFILE,
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      };
+        // Store user in sync with existing patterns but keep it simple
+        localStorage.setItem("user", JSON.stringify(user));
 
-      // Store in primary location
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          isAuthenticated: true,
-          user: userWithTokens,
-        })
-      );
-
-      // Also store in expected locations for session.service.ts compatibility
-      localStorage.setItem("access_token", accessToken);
-      localStorage.setItem("refresh_token", refreshToken);
-      localStorage.setItem("user", JSON.stringify(userWithTokens));
-
-      return true;
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("[authService] Login failed:", error);
+      return false;
     }
-    return false;
   },
 
   logout: () => {
-    localStorage.removeItem(STORAGE_KEY);
-    // Clear all auth-related keys for complete logout
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
+    // Clear all auth-related keys
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem("user");
-    localStorage.removeItem("auth-storage");
+    localStorage.removeItem("devstream_auth"); // Cleanup legacy
+    localStorage.removeItem("auth-storage"); // Cleanup legacy
     window.location.href = "/login";
   },
 
   isAuthenticated: (): boolean => {
     if (typeof window === "undefined") return false;
-    const data = localStorage.getItem(STORAGE_KEY);
-    return !!data;
+    return !!localStorage.getItem(ACCESS_TOKEN_KEY);
   },
 
   getUser: () => {
     if (typeof window === "undefined") return null;
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data).user : null;
+    const data = localStorage.getItem("user");
+    try {
+      return data ? JSON.parse(data) : null;
+    } catch {
+      return null;
+    }
   },
 };

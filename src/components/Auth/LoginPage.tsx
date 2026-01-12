@@ -3,12 +3,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export interface LoginPageProps {
-  login: (u: string, p: string) => Promise<boolean>;
+  login: (e: string, p: string) => Promise<boolean>;
 }
 
 export const LoginPage = ({ login }: LoginPageProps) => {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,12 +20,12 @@ export const LoginPage = ({ login }: LoginPageProps) => {
     setError("");
 
     try {
-      const success = await login(username, password);
+      const success = await login(email, password);
       // specific logic for success is handled by the caller or we can do it here if passed
       if (success) {
         router.push("/hot-modules");
       } else {
-        setError("Invalid credentials. Hint: DevSumo / password");
+        setError("Invalid credentials. Hint: admin@example.com / password");
       }
     } catch {
       setError("An error occurred during login.");
@@ -59,18 +59,18 @@ export const LoginPage = ({ login }: LoginPageProps) => {
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-wider text-white/50 ml-1">
-              Username
+              Email
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-white/20 text-lg">
-                person
+                mail
               </span>
               <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-primary/50 transition-colors placeholder:text-white/20"
-                placeholder="DevSumo"
+                placeholder="example@email.com"
                 required
               />
             </div>
@@ -146,5 +146,5 @@ export const LoginPage = ({ login }: LoginPageProps) => {
 
 export const isLoggedIn = () => {
   if (typeof window === "undefined") return false;
-  return !!localStorage.getItem("access_token");
+  return !!localStorage.getItem("ds_access_token");
 };

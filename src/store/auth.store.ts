@@ -7,7 +7,7 @@ import { User } from "@/components/Organization/organizationData";
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   checkAuth: () => void;
 }
@@ -16,8 +16,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   user: null,
 
-  login: async (username, password) => {
-    const success = await authService.login(username, password);
+  login: async (email, password) => {
+    const success = await authService.login(email, password);
     if (success) {
       set({
         isAuthenticated: true,

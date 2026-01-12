@@ -10,7 +10,7 @@ import { DEV_STREAM } from "../config/environment";
 
 // Create apiClient instance
 const apiClient: ApisauceInstance = create({
-  baseURL: DEV_STREAM.API_BASE_URL,
+  baseURL: DEV_STREAM.API_BASE_URL_LOCAL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -26,7 +26,6 @@ apiClient.addRequestTransform((request) => {
 });
 
 // Use the underlying axios instance for the refresh token interceptor
-// because apisauce transforms don't easily support retrying the original request
 apiClient.axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -39,16 +38,16 @@ apiClient.axiosInstance.interceptors.response.use(
         const refreshToken = getRefreshToken();
         if (refreshToken) {
           const refreshRes = await axios.post(
-            `${DEV_STREAM.API_BASE_URL}/auth/refresh-token`,
+            `${DEV_STREAM.API_BASE_URL_LOCAL}/auth/refresh-token`,
             {
               refreshToken,
             }
           );
 
-          const { access_token } = refreshRes.data;
-          updateAccessToken(access_token);
+          const { accessToken } = refreshRes.data;
+          updateAccessToken(accessToken);
 
-          originalRequest.headers["Authorization"] = `Bearer ${access_token}`;
+          originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
           return apiClient.axiosInstance(originalRequest);
         }
       } catch {
