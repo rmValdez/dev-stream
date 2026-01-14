@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import HotModuleNav from "../HotModuleNav/HotModuleNav";
+import HotModuleNav from "../HotModule/HotModule";
 
 export default function PostCreator() {
   const [mode, setMode] = useState("STATUS");

@@ -16,7 +16,6 @@ export default function AppRoute({ children }: ProtectedRouteProps) {
   useEffect(() => {
     const checkAuth = () => {
       if (!isAuthenticated) {
-        // Redirect to login if not authenticated (both dev and production)
         router.push("/login");
       } else {
         setIsChecking(false);

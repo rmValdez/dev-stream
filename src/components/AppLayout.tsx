@@ -28,6 +28,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const { expandedMenus, toggleMenu, isMobileMenuOpen, toggleMobileMenu } =
     useUIStore();
 
+  const isMusicPage = pathname === "/social-mixes/music";
+
   const [mounted, setMounted] = useState(false);
   const checkAuth = useAuthStore((state) => state.checkAuth);
 
@@ -190,7 +192,26 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
             {/* Dynamic Navigation */}
             <nav className="space-y-1">
-              {NAVIGATION_ITEMS.map((item) => renderNavItem(item))}
+              {NAVIGATION_ITEMS.filter((item) => {
+                // Filter navigation items based on user role
+                const userRole = mounted ? user?.role : undefined;
+                return (
+                  (!item.requiredRoles ||
+                    (userRole &&
+                      (Array.isArray(item.requiredRoles)
+                        ? item.requiredRoles.includes(
+                            userRole as import("@/utils/roleUtils").UserRole
+                          )
+                        : item.requiredRoles === userRole))) &&
+                  (!item.excludedRoles ||
+                    !userRole ||
+                    !(Array.isArray(item.excludedRoles)
+                      ? item.excludedRoles.includes(
+                          userRole as import("@/utils/roleUtils").UserRole
+                        )
+                      : item.excludedRoles === userRole))
+                );
+              }).map((item) => renderNavItem(item))}
             </nav>
 
             {/* Trending Section */}
@@ -216,24 +237,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
               </div>
             </div>
           </div>
-
-          <div className="pt-6">
-            <button className="w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-black text-sm font-bold rounded-lg uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg mb-3">
-              <span className="material-symbols-outlined text-sm font-bold">
-                add
-              </span>
-              New Session
-            </button>
-            <button
-              onClick={() => {
-                authService.logout();
-              }}
-              className="w-full py-2.5 border border-black/10 dark:border-white/10 text-slate-500 dark:text-white/40 text-[10px] font-bold rounded-lg uppercase tracking-widest hover:text-red-500 dark:hover:text-red-400 hover:border-red-500/50 transition-all flex items-center justify-center gap-2"
-            >
-              <span className="material-symbols-outlined text-sm">logout</span>
-              Terminate Session
-            </button>
-          </div>
         </aside>
 
         {/* Dynamic Content Area */}
@@ -242,6 +245,27 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <SystemStatus />
 
         <TerminalOverlay />
+
+        <div
+          className={`fixed left-0 right-0 z-40 px-4 transition-all duration-300 flex flex-col items-start gap-2 pointer-events-none ${
+            isMusicPage ? "bottom-[122px]" : "bottom-10"
+          }`}
+        >
+          <button className="pointer-events-auto px-4 py-2 border border-black/10 dark:border-white/10 bg-white/50 dark:bg-background-dark/50 backdrop-blur-md text-slate-900 dark:text-white text-[10px] font-bold rounded-lg uppercase tracking-widest hover:bg-black/[0.05] dark:hover:bg-white/10 transition-all flex items-center gap-2 shadow-xl">
+            <span className="material-symbols-outlined text-sm font-bold">
+              add
+            </span>
+            New Session
+          </button>
+          <button
+            onClick={() => authService.logout()}
+            className="pointer-events-auto px-4 py-2 border border-black/10 dark:border-white/10 bg-white/50 dark:bg-background-dark/50 backdrop-blur-md text-slate-500 dark:text-white/40 text-[10px] font-bold rounded-lg uppercase tracking-widest hover:text-red-500 dark:hover:text-red-400 hover:border-red-500/50 transition-all flex items-center gap-2 shadow-xl"
+          >
+            <span className="material-symbols-outlined text-sm">logout</span>
+            Terminate Session
+          </button>
+        </div>
+
         <Footer />
 
         {/* mobile overlay */}

@@ -21,14 +21,9 @@ export const authService = {
       if (response.ok && response.data) {
         const { accessToken, refreshToken, user } =
           response.data as LoginResponse;
-
-        // Store tokens with unique keys
         localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
         localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-
-        // Store user in sync with existing patterns but keep it simple
         localStorage.setItem("user", JSON.stringify(user));
-
         return true;
       }
       return false;
@@ -38,14 +33,22 @@ export const authService = {
     }
   },
 
-  logout: () => {
-    // Clear all auth-related keys
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem("user");
-    localStorage.removeItem("devstream_auth"); // Cleanup legacy
-    localStorage.removeItem("auth-storage"); // Cleanup legacy
-    window.location.href = "/login";
+  logout: async () => {
+    try {
+      const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+      const response = await apiClient.post("/auth/logout", { refreshToken });
+      if (response.ok && response.data) {
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("[authService] Logout failed:", error);
+      return false;
+    }
   },
 
   isAuthenticated: (): boolean => {
