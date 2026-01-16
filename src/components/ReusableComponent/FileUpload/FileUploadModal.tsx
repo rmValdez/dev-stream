@@ -62,7 +62,10 @@ export default function FileUploadModal({
         onUploadSuccess();
         handleClose();
       } else {
-        setError(response.data?.message || "Failed to upload file");
+        setError(
+          (response.data as { message?: string })?.message ||
+            "Failed to upload file"
+        );
       }
     } catch (err: any) {
       setError(err.message || "Failed to upload file");

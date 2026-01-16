@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import FeedPostComponent from "./FeedPost";
+import FeedPostComponent from "./SocialFeedPost";
 import { FeedPost, generateMockPosts } from "./feedData";
 
 export default function FeedStream() {

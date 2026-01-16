@@ -51,6 +51,42 @@ export const authService = {
     }
   },
 
+  register: async (data: {
+    email: string;
+    password: string;
+    username: string;
+    firstName?: string;
+    lastName?: string;
+  }): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const response = await apiClient.post("/auth/register", data);
+
+      if (response.ok && response.data) {
+        const { accessToken, refreshToken, user } = (
+          response.data as {
+            response: { accessToken: string; refreshToken: string; user: User };
+          }
+        ).response;
+        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        localStorage.setItem("user", JSON.stringify(user));
+        return { success: true };
+      }
+      return {
+        success: false,
+        message:
+          (response.data as { message?: string })?.message ||
+          "Registration failed",
+      };
+    } catch (error) {
+      console.error("[authService] Registration failed:", error);
+      return {
+        success: false,
+        message: (error as Error).message || "An unexpected error occurred",
+      };
+    }
+  },
+
   isAuthenticated: (): boolean => {
     if (typeof window === "undefined") return false;
     return !!localStorage.getItem(ACCESS_TOKEN_KEY);

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 export default function TerminalOverlay() {
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const isMusicPage = pathname === "/social-mixes/music";
 
@@ -13,11 +14,15 @@ export default function TerminalOverlay() {
   const startYRef = React.useRef(0);
   const startHeightRef = React.useRef(0);
 
-  React.useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
-      const delta = startYRef.current - e.clientY;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
+  useEffect(() => {
+    if (!mounted || !isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const delta = startYRef.current - e.clientY;
       const bottomOffset = isMusicPage ? 90 : 0;
       const topMargin = 100;
       const maxAllowedHeight = window.innerHeight - topMargin - bottomOffset;
@@ -28,7 +33,6 @@ export default function TerminalOverlay() {
       );
       setHeight(newHeight);
 
-      // Auto-update state based on height
       if (newHeight <= 48) setIsMinimized(true);
       else setIsMinimized(false);
     };
@@ -39,16 +43,14 @@ export default function TerminalOverlay() {
       document.body.style.userSelect = "auto";
     };
 
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-    }
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, isMusicPage]);
+  }, [isDragging, isMusicPage, mounted]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
@@ -70,10 +72,12 @@ export default function TerminalOverlay() {
 
   const toggleMaximize = () => {
     const bottomOffset = isMusicPage ? 90 : 0;
-    const topMargin = 100; // Keep header visible
+    const topMargin = 100;
     setHeight(window.innerHeight - topMargin - bottomOffset);
     setIsMinimized(false);
   };
+
+  if (!mounted) return null;
 
   return (
     <div
@@ -81,12 +85,10 @@ export default function TerminalOverlay() {
         isMusicPage ? "bottom-[90px] pb-8" : "bottom-0 pb-6"
       }`}
     >
-      {/* Resizable Container */}
       <div
         className="terminal-glass border border-black/5 dark:border-white/10 rounded-xl overflow-hidden shadow-2xl pointer-events-auto flex flex-col relative transition-height duration-100 ease-out"
         style={{ height: `${height}px` }}
       >
-        {/* Resize Handle */}
         <div
           className="absolute top-0 left-0 right-0 h-1.5 cursor-ns-resize bg-transparent hover:bg-primary/50 transition-colors z-50"
           onMouseDown={handleMouseDown}
@@ -99,7 +101,7 @@ export default function TerminalOverlay() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5 group">
               <button
-                onClick={() => setHeight(0)} // Close/Hide - distinct from minimize
+                onClick={() => setHeight(0)}
                 className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-white/10 border border-slate-400/20 dark:border-white/20 hover:bg-red-500 transition-colors"
                 title="Close"
               ></button>
@@ -121,7 +123,6 @@ export default function TerminalOverlay() {
               )}
             </span>
           </div>
-          {/* Controls */}
           <div className="flex items-center gap-3">
             <div
               className="flex gap-1 opacity-20 hover:opacity-100 transition-opacity cursor-ns-resize"

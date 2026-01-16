@@ -16,6 +16,7 @@ export default function Calendar({ onEventClick }: CalendarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuthStore();
 
   // Get calendar data
@@ -85,15 +86,36 @@ export default function Calendar({ onEventClick }: CalendarProps) {
     );
   };
 
+  // Check if date is in the past
+  const isPastDate = (day: number) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkDate = new Date(year, month, day);
+    return checkDate < today;
+  };
+
   // Get events for a specific date
   const getEventsForDate = (day: number) => {
     return events.filter((event) => {
       const eventDate = new Date(event.startAt);
-      return (
+      const matchesDate =
         eventDate.getDate() === day &&
         eventDate.getMonth() === month &&
-        eventDate.getFullYear() === year
-      );
+        eventDate.getFullYear() === year;
+
+      if (!matchesDate) return false;
+
+      // Filter by search query
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchesTitle = event.title.toLowerCase().includes(query);
+        const matchesDescription = event.description
+          ?.toLowerCase()
+          .includes(query);
+        return matchesTitle || matchesDescription;
+      }
+
+      return true;
     });
   };
 
@@ -111,6 +133,10 @@ export default function Calendar({ onEventClick }: CalendarProps) {
 
   // Handle date click
   const handleDateClick = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (date < today) return;
+
     setSelectedDate(date);
     setEditingEvent(null);
     setIsModalOpen(true);
@@ -130,7 +156,7 @@ export default function Calendar({ onEventClick }: CalendarProps) {
       console.error("User not authenticated");
       return;
     }
-
+    console.log("editingEventeditingEventeditingEvent", editingEvent);
     try {
       if (editingEvent) {
         // Update existing event
@@ -185,15 +211,18 @@ export default function Calendar({ onEventClick }: CalendarProps) {
   for (let day = 1; day <= daysInMonth; day++) {
     const dayEvents = getEventsForDate(day);
     const today = isToday(day);
+    const past = isPastDate(day);
 
     calendarDays.push(
       <div
         key={day}
-        onClick={() => handleDateClick(new Date(year, month, day))}
-        className={`aspect-square p-2 rounded-lg border transition-all cursor-pointer ${
-          today
-            ? "bg-primary/10 border-primary/30 ring-2 ring-primary/20"
-            : "bg-white dark:bg-black/20 border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5"
+        onClick={() => !past && handleDateClick(new Date(year, month, day))}
+        className={`aspect-square p-2 rounded-lg border transition-all ${
+          past
+            ? "bg-black/5 dark:bg-white/5 border-transparent opacity-40 cursor-not-allowed"
+            : today
+            ? "bg-primary/10 border-primary/30 ring-2 ring-primary/20 cursor-pointer"
+            : "bg-white dark:bg-black/20 border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
         }`}
       >
         <div className="flex flex-col h-full">
@@ -247,6 +276,18 @@ export default function Calendar({ onEventClick }: CalendarProps) {
             Calendar
           </h3>
           <div className="flex gap-2">
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-sm">
+                search
+              </span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search events..."
+                className="pl-9 pr-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white placeholder:text-white/40 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors w-48"
+              />
+            </div>
             <button
               onClick={() => {
                 setSelectedDate(new Date());

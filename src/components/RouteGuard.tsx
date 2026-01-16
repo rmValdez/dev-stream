@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { canAccessRoute, UserRole } from "@/utils/roleUtils";
@@ -12,22 +12,6 @@ interface RouteGuardProps {
   redirectTo?: string;
 }
 
-/**
- * Route guard component to protect routes based on user roles
- *
- * Usage:
- * <RouteGuard requiredRoles="admin">
- *   <AdminPage />
- * </RouteGuard>
- *
- * <RouteGuard requiredRoles={["admin", "moderator"]}>
- *   <ModeratorPage />
- * </RouteGuard>
- *
- * <RouteGuard excludedRoles="guest">
- *   <PremiumFeature />
- * </RouteGuard>
- */
 export default function RouteGuard({
   children,
   requiredRoles,
@@ -36,16 +20,28 @@ export default function RouteGuard({
 }: RouteGuardProps) {
   const router = useRouter();
   const { user } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     const userRole = user?.role;
 
     if (!canAccessRoute(userRole, requiredRoles, excludedRoles)) {
       router.push(redirectTo);
     }
-  }, [user, requiredRoles, excludedRoles, redirectTo, router]);
+  }, [user, requiredRoles, excludedRoles, redirectTo, router, mounted]);
 
   const userRole = user?.role;
+
+  // Don't render anything until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return null;
+  }
 
   // Don't render children if user doesn't have access
   if (!canAccessRoute(userRole, requiredRoles, excludedRoles)) {

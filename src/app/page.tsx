@@ -1,40 +1,33 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isLoggedIn } from "@/components/Auth/LoginPage";
-import IntroAnimation from "@/components/IntroAnimation";
-import { useUIStore } from "@/store/ui.store";
 
 export default function Home() {
   const router = useRouter();
-  const { hasSeenIntro, setHasSeenIntro } = useUIStore();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // If not authenticated, go to login.
-    // If authenticated, go to hot-modules.
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    // If logged in, redirect to hot-modules
+    // If not, redirect to login
     if (isLoggedIn()) {
       router.push("/hot-modules");
     } else {
       router.push("/login");
     }
-  }, [router]);
+  }, [router, mounted]);
 
-  // Handle intro animation logic if we want to show it before redirecting
-  // For now, we are redirecting immediately, but keeping this for structure
-  const handleIntroComplete = () => {
-    setHasSeenIntro(true);
-    if (isLoggedIn()) {
-      router.push("/hot-modules");
-    } else {
-      router.push("/login");
-    }
-  };
-
-  // Show intro only if not seen
-  if (!hasSeenIntro) {
-    return <IntroAnimation onComplete={handleIntroComplete} />;
-  }
-
-  return null; // or a loading spinner while redirecting
+  // Return a minimal loading state while mounting/redirecting
+  return (
+    <div className="h-screen w-full flex items-center justify-center bg-black">
+      <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+    </div>
+  );
 }

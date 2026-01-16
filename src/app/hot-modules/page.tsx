@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import FeedStream from "@/components/FeedStream/FeedStream";
-import PostCreator from "@/components/PostCreator/PostCreator";
+import FeedStream from "@/components/SocialHotModule/SocialFeedStream";
+import PostCreator from "@/components/SocialHotModule/SocialPostCreator";
 import PageHeader from "@/components/PageHeader/PageHeader";
 import PageWrapper from "@/components/ReusableComponent/PageWrapperComponent";
 

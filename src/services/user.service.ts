@@ -8,7 +8,6 @@ export class UserService {
    */
   async getUserDetail(userId: string): Promise<AuthUserDetail> {
     const response = await apisauce.get(`/users/${userId}`);
-    console.log("++++++++++", response.data);
     if (!response.ok) {
       throw new Error(response.problem || "Failed to fetch user details");
     }

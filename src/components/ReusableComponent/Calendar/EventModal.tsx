@@ -4,21 +4,23 @@ import { useEffect, useState } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 import dayjs from "dayjs";
 
-interface CalendarEvent {
+import { CalendarEvent, EventType } from "@/services/calendar.service";
+
+interface EventFormData {
   id?: string | undefined;
   title: string;
   description?: string;
   startTime: Date;
   endTime: Date;
-  type: string;
+  type: EventType;
 }
 
 interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (event: CalendarEvent) => void;
+  onSave: (event: EventFormData) => void;
   selectedDate?: Date;
-  editEvent?: CalendarEvent | null;
+  editEvent?: CalendarEvent | null | undefined;
 }
 
 export default function EventModal({
@@ -34,10 +36,10 @@ export default function EventModal({
   const getInitialType = () => editEvent?.type || "MEETING";
 
   const getInitialDateRange = () => {
-    if (editEvent?.startTime && editEvent?.endTime) {
+    if (editEvent?.startAt && editEvent?.endAt) {
       return {
-        startDate: dayjs(editEvent.startTime).format("YYYY-MM-DD"),
-        endDate: dayjs(editEvent.endTime).format("YYYY-MM-DD"),
+        startDate: dayjs(editEvent.startAt).format("YYYY-MM-DD"),
+        endDate: dayjs(editEvent.endAt).format("YYYY-MM-DD"),
       };
     }
     if (selectedDate) {
@@ -48,27 +50,20 @@ export default function EventModal({
     }
     return { startDate: null, endDate: null };
   };
-
+  console.log("editEvent", editEvent);
   const getInitialStartTime = () => {
-    if (editEvent?.startTime) {
-      return dayjs(editEvent.startTime).format("HH:mm");
+    if (editEvent?.startAt) {
+      return dayjs(editEvent.startAt).format("HH:mm");
     }
     return "09:00";
   };
 
   const getInitialEndTime = () => {
-    if (editEvent?.endTime) {
-      return dayjs(editEvent.endTime).format("HH:mm");
+    if (editEvent?.endAt) {
+      return dayjs(editEvent.endAt).format("HH:mm");
     }
     return "10:00";
   };
-
-  // const [title, setTitle] = useState(getInitialTitle());
-  // const [description, setDescription] = useState(getInitialDescription());
-  // const [dateRange, setDateRange] = useState(getInitialDateRange());
-  // const [startTime, setStartTime] = useState(getInitialStartTime());
-  // const [endTime, setEndTime] = useState(getInitialEndTime());
-  // const [eventType, setEventType] = useState(getInitialType());
 
   const [eventData, setEventData] = useState({
     title: getInitialTitle(),
@@ -98,23 +93,30 @@ export default function EventModal({
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    // const startDateTime = dayjs(
-    //   `${dateRange.startDate} ${startTime}`,
-    //   "YYYY-MM-DD HH:mm"
-    // ).toDate();
-    // const endDateTime = dayjs(
-    //   `${dateRange.endDate || dateRange.startDate} ${endTime}`,
-    //   "YYYY-MM-DD HH:mm"
-    // ).toDate();
+    if (!eventData.dateRange.startDate) {
+      alert("Please select a date");
+      return;
+    }
 
-    // onSave({
-    //   id: editEvent?.id,
-    //   title,
-    //   description,
-    //   startTime: startDateTime,
-    //   endTime: endDateTime,
-    //   type: eventType,
-    // });
+    const startDateTime = dayjs(
+      `${eventData.dateRange.startDate} ${eventData.startTime}`,
+      "YYYY-MM-DD HH:mm"
+    ).toDate();
+    const endDateTime = dayjs(
+      `${eventData.dateRange.endDate || eventData.dateRange.startDate} ${
+        eventData.endTime
+      }`,
+      "YYYY-MM-DD HH:mm"
+    ).toDate();
+
+    onSave({
+      id: editEvent?.id,
+      title: eventData.title,
+      description: eventData.description,
+      startTime: startDateTime,
+      endTime: endDateTime,
+      type: eventData.type as any,
+    });
     handleClose();
   };
 
@@ -131,8 +133,7 @@ export default function EventModal({
   };
 
   const handleDateChange = (newValue: any) => {
-    console.log("newValue", newValue);
-    // setDateRange(newValue);
+    setEventData({ ...eventData, dateRange: newValue });
   };
 
   const eventTypes = [
@@ -171,7 +172,7 @@ export default function EventModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-background-dark border border-black/10 dark:border-white/10 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden">
+      <div className="bg-white dark:bg-background-dark border border-black/10 dark:border-white/10 rounded-2xl max-w-lg w-full shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-black/10 dark:border-white/10 bg-gradient-to-r from-primary/10 to-purple-500/10">
           <div className="flex items-center gap-3">
@@ -191,7 +192,7 @@ export default function EventModal({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-5 space-y-5">
+        <form onSubmit={handleSubmit} className="p-5 space-y-5 text-slate-900">
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-white/70 mb-2">
@@ -231,27 +232,10 @@ export default function EventModal({
               Date *
             </label>
             <Datepicker
-              value={eventData.startTime}
+              value={eventData.dateRange as any}
               onChange={handleDateChange}
-              useRange={false}
-              asSingle={true}
-              primaryColor="blue"
-              inputClassName="w-full px-4 py-3 rounded-xl bg-white dark:bg-black/20 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-              containerClassName="relative"
-              popoverDirection="down"
-            />
-          </div>
-
-          {/* Date Picker */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-white/70 mb-2">
-              Date *
-            </label>
-            <Datepicker
-              value={eventData.endTime}
-              onChange={handleDateChange}
-              useRange={false}
-              asSingle={true}
+              useRange={true}
+              asSingle={false}
               primaryColor="blue"
               inputClassName="w-full px-4 py-3 rounded-xl bg-white dark:bg-black/20 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
               containerClassName="relative"
@@ -266,8 +250,10 @@ export default function EventModal({
                 Start Time *
               </label>
               <select
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
+                value={eventData.startTime}
+                onChange={(e) =>
+                  setEventData({ ...eventData, startTime: e.target.value })
+                }
                 required
                 className="w-full px-4 py-3 rounded-xl bg-white dark:bg-black/20 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
               >
@@ -283,8 +269,10 @@ export default function EventModal({
                 End Time *
               </label>
               <select
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
+                value={eventData.endTime}
+                onChange={(e) =>
+                  setEventData({ ...eventData, endTime: e.target.value })
+                }
                 required
                 className="w-full px-4 py-3 rounded-xl bg-white dark:bg-black/20 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
               >
@@ -307,9 +295,14 @@ export default function EventModal({
                 <button
                   key={type.value}
                   type="button"
-                  onClick={() => setEventType(type.value)}
+                  onClick={() =>
+                    setEventData({
+                      ...eventData,
+                      type: type.value as EventType,
+                    })
+                  }
                   className={`px-3 py-2.5 rounded-xl border text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
-                    eventType === type.value
+                    eventData.type === type.value
                       ? `${type.color} text-white border-transparent shadow-lg`
                       : "bg-white dark:bg-black/20 border-black/10 dark:border-white/10 text-slate-700 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/5"
                   }`}

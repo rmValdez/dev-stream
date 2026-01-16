@@ -12,8 +12,15 @@ export default function AppRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
   const [isChecking, setIsChecking] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     const checkAuth = () => {
       if (!isAuthenticated) {
         router.push("/login");
@@ -24,9 +31,9 @@ export default function AppRoute({ children }: ProtectedRouteProps) {
 
     const timer = setTimeout(checkAuth, 100);
     return () => clearTimeout(timer);
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, user, router, mounted]);
 
-  if (isChecking) {
+  if (!mounted || isChecking) {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center bg-background-dark font-mono text-primary">
         <div className="relative group cursor-default">

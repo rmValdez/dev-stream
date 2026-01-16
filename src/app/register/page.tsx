@@ -2,9 +2,12 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { authService } from "@/services/authService";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -12,11 +15,39 @@ export default function RegisterPage() {
     confirmPassword: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, registration just redirects to login as it's a dummy flow
-    // In a real app, this would call authService.register()
-    router.push("/login");
+    setError(null);
+
+    // Basic validation
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await authService.register({
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+      });
+
+      if (result.success) {
+        router.push("/"); // Redirect to dashboard or home
+      } else {
+        setError(result.message || "Registration failed");
+      }
+    } catch {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,6 +64,12 @@ export default function RegisterPage() {
           </h1>
           <p className="text-sm text-white/40">Create your secure identity.</p>
         </div>
+
+        {error && (
+          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm animate-shake">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -100,9 +137,19 @@ export default function RegisterPage() {
 
           <button
             type="submit"
-            className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-lg transition-all mt-4 border border-white/5"
+            disabled={loading}
+            className={`w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-lg transition-all mt-4 border border-white/5 flex items-center justify-center gap-2 ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Initialize Account
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                Initializing...
+              </>
+            ) : (
+              "Initialize Account"
+            )}
           </button>
         </form>
 

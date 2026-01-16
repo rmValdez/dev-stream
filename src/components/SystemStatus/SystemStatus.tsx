@@ -1,8 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 export default function SystemStatus() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <aside className="w-80 border-l border-black/10 dark:border-white/5 bg-white dark:bg-background-dark flex flex-col shrink-0 z-20">
       <div className="p-6 border-b border-black/10 dark:border-white/10">
@@ -66,6 +74,7 @@ export default function SystemStatus() {
             </div>
           </div>
         </div>
+        {/* ... rest of the component remains same ... */}
         <div className="p-6 space-y-4 border-b border-black/5 dark:border-white/5">
           <div className="flex items-center justify-between">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-white/40">

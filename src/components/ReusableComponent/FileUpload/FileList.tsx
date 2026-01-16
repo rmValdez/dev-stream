@@ -26,7 +26,7 @@ export default function FileList({
       setLoading(true);
       const response = await apiClient.get("/files");
       if (response.ok && response.data) {
-        setFiles(response.data.data || []);
+        setFiles((response.data as { data: UserFile[] }).data || []);
       }
     } catch (error) {
       console.error("Failed to fetch files:", error);

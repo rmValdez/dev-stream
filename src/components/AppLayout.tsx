@@ -15,12 +15,14 @@ import TerminalOverlay from "@/components/TerminalOverlay/TerminalOverlay";
 import AppRoute from "@/components/AppRoute";
 import SystemStatus from "@/components/SystemStatus/SystemStatus";
 import { authService } from "@/services/authService";
+import { UserRole } from "@/utils/roleUtils";
 
 interface AppLayoutProps {
   children?: React.ReactNode;
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuthStore();
@@ -28,20 +30,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const { expandedMenus, toggleMenu, isMobileMenuOpen, toggleMobileMenu } =
     useUIStore();
 
-  const isMusicPage = pathname === "/social-mixes/music";
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [mounted, setMounted] = useState(false);
+  const isMusicPage = pathname === "/social-mixes/music";
   const checkAuth = useAuthStore((state) => state.checkAuth);
 
-  // Hydration safety + restore auth state from localStorage
   useEffect(() => {
-    checkAuth(); // Restore auth state from localStorage on mount
-    const timer = setTimeout(() => setMounted(true), 0);
-    return () => clearTimeout(timer);
+    checkAuth();
+    setMounted(true);
   }, [checkAuth]);
 
   const isActive = (href?: string) => {
-    if (!href) return false;
+    if (!href || !pathname) return false;
     return pathname === href;
   };
 
@@ -55,7 +55,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const renderNavItem = (item: NavItem) => {
     const hasChildren = item.children && item.children.length > 0;
-    // Force default state ("Social Mixes" expanded) on server/initial render to match hydration
     const isExpanded = mounted
       ? expandedMenus.includes(item.label)
       : ["Social Mixes"].includes(item.label);
@@ -193,22 +192,17 @@ export default function AppLayout({ children }: AppLayoutProps) {
             {/* Dynamic Navigation */}
             <nav className="space-y-1">
               {NAVIGATION_ITEMS.filter((item) => {
-                // Filter navigation items based on user role
                 const userRole = mounted ? user?.role : undefined;
                 return (
                   (!item.requiredRoles ||
                     (userRole &&
                       (Array.isArray(item.requiredRoles)
-                        ? item.requiredRoles.includes(
-                            userRole as import("@/utils/roleUtils").UserRole
-                          )
+                        ? item.requiredRoles.includes(userRole as UserRole)
                         : item.requiredRoles === userRole))) &&
                   (!item.excludedRoles ||
                     !userRole ||
                     !(Array.isArray(item.excludedRoles)
-                      ? item.excludedRoles.includes(
-                          userRole as import("@/utils/roleUtils").UserRole
-                        )
+                      ? item.excludedRoles.includes(userRole as UserRole)
                       : item.excludedRoles === userRole))
                 );
               }).map((item) => renderNavItem(item))}
@@ -242,8 +236,23 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {/* Dynamic Content Area */}
         <div className="flex-1 flex overflow-hidden">{children}</div>
 
-        <SystemStatus />
+        {/* Fixed Global Search Bar */}
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/40 text-lg pointer-events-none">
+              search
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search anything..."
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/90 dark:bg-background-dark/90 backdrop-blur-xl border border-black/10 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-2xl transition-all"
+            />
+          </div>
+        </div>
 
+        <SystemStatus />
         <TerminalOverlay />
 
         <div
