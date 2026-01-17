@@ -1,9 +1,6 @@
 import { User } from "@/components/Organization/organizationData";
 import apiClient from "./apiSauce";
 
-const ACCESS_TOKEN_KEY = "ds_access_token";
-const REFRESH_TOKEN_KEY = "ds_refresh_token";
-
 interface LoginResponse {
   accessToken: string;
   refreshToken: string;
@@ -19,10 +16,7 @@ export const authService = {
       });
 
       if (response.ok && response.data) {
-        const { accessToken, refreshToken, user } =
-          response.data as LoginResponse;
-        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        const { user } = response.data as LoginResponse;
         localStorage.setItem("user", JSON.stringify(user));
         return true;
       }
@@ -35,11 +29,8 @@ export const authService = {
 
   logout: async () => {
     try {
-      const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-      const response = await apiClient.post("/auth/logout", { refreshToken });
-      if (response.ok && response.data) {
-        localStorage.removeItem(ACCESS_TOKEN_KEY);
-        localStorage.removeItem(REFRESH_TOKEN_KEY);
+      const response = await apiClient.post("/auth/logout", {});
+      if (response.ok) {
         localStorage.removeItem("user");
         window.location.href = "/login";
         return true;
@@ -62,13 +53,11 @@ export const authService = {
       const response = await apiClient.post("/auth/register", data);
 
       if (response.ok && response.data) {
-        const { accessToken, refreshToken, user } = (
+        const { user } = (
           response.data as {
-            response: { accessToken: string; refreshToken: string; user: User };
+            response: { user: User };
           }
         ).response;
-        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
         localStorage.setItem("user", JSON.stringify(user));
         return { success: true };
       }
@@ -89,7 +78,7 @@ export const authService = {
 
   isAuthenticated: (): boolean => {
     if (typeof window === "undefined") return false;
-    return !!localStorage.getItem(ACCESS_TOKEN_KEY);
+    return !!localStorage.getItem("user");
   },
 
   getUser: () => {

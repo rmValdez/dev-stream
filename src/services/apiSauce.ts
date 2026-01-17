@@ -1,6 +1,5 @@
 import { create, ApisauceInstance } from "apisauce";
 import {
-  getAuthToken,
   getRefreshToken,
   clearAuthTokens,
   updateAccessToken,
@@ -14,15 +13,8 @@ const apiClient: ApisauceInstance = create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
   timeout: 30000,
-});
-
-// Request Transform to attach token
-apiClient.addRequestTransform((request) => {
-  const token = getAuthToken();
-  if (token && request.headers) {
-    request.headers["Authorization"] = `Bearer ${token}`;
-  }
 });
 
 // Use the underlying axios instance for the refresh token interceptor
@@ -41,13 +33,13 @@ apiClient.axiosInstance.interceptors.response.use(
             `${DEV_STREAM.API_BASE_URL_LOCAL}/auth/refresh-token`,
             {
               refreshToken,
-            }
+            },
+            { withCredentials: true }
           );
 
           const { accessToken } = refreshRes.data;
           updateAccessToken(accessToken);
 
-          originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
           return apiClient.axiosInstance(originalRequest);
         }
       } catch {

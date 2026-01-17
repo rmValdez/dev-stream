@@ -20,14 +20,15 @@ const MOCK_IMAGES = ["/favicon.ico", "/favicon.ico"];
 export const generateMockPosts = (page: number, limit: number): FeedPost[] => {
   return Array.from({ length: limit }).map((_, i) => {
     const isEven = i % 2 === 0;
+    const globalIndex = (page - 1) * limit + i;
     return {
-      id: `post-${page}-${i}-${Date.now()}`,
+      id: `post-${page}-${i}-${globalIndex}`, // Stable ID
       author: {
         initials: isEven ? "SD" : "RK",
         name: isEven ? "Sarah_Dev" : "Ryan_K",
         role: isEven ? "Master Engineer" : "DevOps Lead",
       },
-      timestamp: `${Math.floor(Math.random() * 60)}m ago`,
+      timestamp: `${(globalIndex % 60) + 1}m ago`, // Stable timestamp
       content: isEven
         ? "Testing out the new UI grid system for the dashboard components. Everything is aligning perfectly in the latest build."
         : "Just deployed the new microservices architecture. Latency dropped by 40% across the board! 🚀",
@@ -35,10 +36,10 @@ export const generateMockPosts = (page: number, limit: number): FeedPost[] => {
         ? ["#designsystem", "#frontend", "#ui"]
         : ["#devops", "#k8s", "#performance"],
       image:
-        Math.random() > 0.3 ? MOCK_IMAGES[i % MOCK_IMAGES.length] : undefined,
+        globalIndex % 3 !== 0 ? MOCK_IMAGES[i % MOCK_IMAGES.length] : undefined, // Deterministic image
       stats: {
-        likes: Math.floor(Math.random() * 500) + 10,
-        comments: Math.floor(Math.random() * 100) + 2,
+        likes: ((globalIndex * 13) % 500) + 10, // Deterministic likes
+        comments: ((globalIndex * 7) % 100) + 2, // Deterministic comments
       },
     };
   });

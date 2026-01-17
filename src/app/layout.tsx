@@ -38,7 +38,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="antialiased">
+      <body className="antialiased" suppressHydrationWarning>
         <ThemeProvider>
           <React.Suspense fallback={<div className="min-h-screen bg-black" />}>
             <AppLayout>{children}</AppLayout>

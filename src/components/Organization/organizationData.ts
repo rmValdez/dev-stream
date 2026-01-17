@@ -100,9 +100,9 @@ const STATUSES: ("online" | "offline" | "dnd")[] = [
 
 const generateUsers = (count: number): User[] => {
   const generated = Array.from({ length: count }, (_, i) => {
-    const name = NAMES[Math.floor(Math.random() * NAMES.length)];
-    const role = ROLES[Math.floor(Math.random() * ROLES.length)];
-    const status = STATUSES[Math.floor(Math.random() * STATUSES.length)];
+    const name = NAMES[i % NAMES.length];
+    const role = ROLES[i % ROLES.length];
+    const status = STATUSES[i % STATUSES.length];
 
     return {
       id: `${i + 2}`,
@@ -110,7 +110,7 @@ const generateUsers = (count: number): User[] => {
       username: name.toLowerCase() + (i + 2),
       role: role,
       status: status,
-      avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)],
+      avatar: AVATARS[i % AVATARS.length],
     };
   });
 
@@ -129,26 +129,22 @@ const generateUsers = (count: number): User[] => {
 
 const generateMessages = (count: number): Message[] => {
   const messages: Message[] = [];
-  const baseTime = new Date();
-  baseTime.setHours(9, 0, 0, 0); // Start at 9:00 AM today
+  const baseTime = new Date("2026-01-17T09:00:00"); // Fixed base time for hydration stability
 
   for (let i = 0; i < count; i++) {
-    const isMe = Math.random() > 0.95; // 5% chance it's the current user
-    const isSystem = !isMe && Math.random() > 0.95;
+    const isMe = i % 20 === 0; // Deterministic "isMe"
+    const isSystem = !isMe && i % 15 === 0; // Deterministic "isSystem"
 
-    const name = NAMES[Math.floor(Math.random() * NAMES.length)];
-    const role = ROLES[Math.floor(Math.random() * ROLES.length)];
-    const content =
-      MESSAGE_TEMPLATES[Math.floor(Math.random() * MESSAGE_TEMPLATES.length)];
+    const name = NAMES[i % NAMES.length];
+    const role = ROLES[i % ROLES.length];
+    const content = MESSAGE_TEMPLATES[i % MESSAGE_TEMPLATES.length];
 
-    // Increment time by 1-5 minutes for each message
-    baseTime.setMinutes(
-      baseTime.getMinutes() + Math.floor(Math.random() * 5) + 1
-    );
+    // Increment time by 2 minutes for each message (deterministic)
+    const messageTime = new Date(baseTime.getTime() + i * 2 * 60000);
 
     // Format timestamp
-    const hour = baseTime.getHours();
-    const minute = baseTime.getMinutes().toString().padStart(2, "0");
+    const hour = messageTime.getHours();
+    const minute = messageTime.getMinutes().toString().padStart(2, "0");
     const ampm = hour >= 12 ? "PM" : "AM";
     const hour12 = hour % 12 || 12;
 
@@ -164,15 +160,15 @@ const generateMessages = (count: number): Message[] => {
           ? USER_PROFILE.avatar
           : isSystem
           ? ""
-          : AVATARS[Math.floor(Math.random() * AVATARS.length)],
+          : AVATARS[i % AVATARS.length],
         color: isMe
           ? "text-primary"
           : isSystem
           ? "text-primary"
-          : COLORS[Math.floor(Math.random() * COLORS.length)],
+          : COLORS[i % COLORS.length],
       },
       content: isSystem
-        ? `System Alert: Process ${Math.floor(Math.random() * 9000)} started.`
+        ? `System Alert: Process ${1000 + i} started.`
         : content,
       timestamp: `${hour12}:${minute} ${ampm}`,
       isSystem: isSystem,
